@@ -7,7 +7,9 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI);
 import '@/mixin';
-import './apis/apis'
+import './apis/apis';
+import jgTable from '@/components/common/jgTable';
+Vue.component('jg-table',jgTable)
 
 Vue.config.productionTip = false
 

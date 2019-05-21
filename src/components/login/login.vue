@@ -43,12 +43,10 @@ export default {
                 if(valid){
                     this.$http.post(this.$apis.signin,this.loginInfo)
                     .then((resp)=>{
-                        console.log(resp);
                         resp = resp.data;
                         var token = resp.token;
                         var success = resp.success;
                         var response = JSON.stringify(resp.response);
-                        console.log(response)
                         if(success){
                             localStorage.setItem("token",token);
                             localStorage.setItem('response',response)
@@ -56,9 +54,6 @@ export default {
                             // 判断是否需要重定向，如果不需要重定向，直接跳转
                             // 到home组件
                             if(!query.redirect){
-                                alert('sss')
-                                console.log('dd')
-                                console.log(response)
                                 this.$router.push({name:'home',params:{response}})
                             }else{
                                 this.$router.push({path:query.redirect})
@@ -84,7 +79,7 @@ export default {
         right: 0;
         bottom: 0;
         left: 0;
-        background: url(http://a.hiphotos.baidu.com/image/h%3D300/sign=f650da7726381f3081198ba999004c67/6159252dd42a28345ce4de4455b5c9ea15cebf3b.jpg) no-repeat;
+        background: url(http://img1.imgtn.bdimg.com/it/u=2266948452,1197874603&fm=26&gp=0.jpg) no-repeat;
         background-size: cover
     }
     #loginBar{
