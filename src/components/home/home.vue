@@ -46,10 +46,11 @@ export default {
               this.$router.push({name:'login'})
           }
           this.operatorConfirm('退出',action)
-      }
+      },
     },
     created(){
         this.$store.dispatch('loadAllPermission')
+        this.$store.dispatch('loadAllRoles')
     },
     mounted(){
         var response = JSON.parse(localStorage.response);

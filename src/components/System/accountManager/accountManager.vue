@@ -37,7 +37,7 @@
             </template>
         </jg-table>
         <el-dialog
-        title="提示"
+        title="新增账号"
         :visible.sync="dialogVisible"
         width="30%"
         :before-close="handleClose">
@@ -46,23 +46,24 @@
                 <el-input v-model="ruleForm.username"></el-input>
             </el-form-item>
             <el-form-item label="密码" prop="password">
-                <el-input v-model="ruleForm.password"></el-input>
+                <el-input type="password" v-model="ruleForm.password"></el-input>
             </el-form-item>
             <el-form-item label="角色">
-                <el-checkbox-group v-model="ruleForm.type">
-                <el-checkbox label="admin" name="type"></el-checkbox>
-                </el-checkbox-group>
+                <el-radio-group v-model="ruleForm.type">
+                        <el-radio v-for="(item,index) in allRoles" :key="index" :label="item.roleName"></el-radio>
+                </el-radio-group>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+            <el-button @click="cancel">取 消</el-button>
+            <el-button type="primary" @click="addNewUser">确 定</el-button>
         </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
+import {mapGetters} from 'vuex'
 export default {
     data(){
         return{
@@ -86,9 +87,16 @@ export default {
     methods:{
         handleEdit(index, row) {
             console.log(index, row);
+            this.ruleForm = row;
+            this.dialogVisible = true
+
         },
         handleDelete(index, row) {
             console.log(index, row);
+            this.$http.post(this.$apis.deleteUser,row).then(()=>{
+                console.log('删除了')
+                this.Refresh()
+            })
         },
         handleClose(done) {
         this.$confirm('确认关闭？')
@@ -96,11 +104,26 @@ export default {
             done();
           })
           .catch(_ => {});
+      },
+      cancel(){
+          this.ruleForm ={};
+          this.ruleForm.type = [];
+          this.dialogVisible=false
+      },
+      addNewUser(){
+          console.log(this.$refs);
+          this.$refs.ruleForm.validate((valid)=>{
+              if(valid){
+                this.dialogVisible = false
+              }
+          })
       }
+    },
+    computed:{
+        ...mapGetters(['allRoles'])
     },
     mounted(){
         this.$http.get(this.$apis.findAllUsers).then((resp)=>{
-            console.log(resp);
             this.allUsers = resp.data.allUsers
         });
     }

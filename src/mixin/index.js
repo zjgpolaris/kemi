@@ -17,6 +17,9 @@ Vue.mixin({
                     message: '取消'+message
                 });          
             });
+        },
+        Refresh(){
+            this.$router.go(0)
         }
     }
 })
