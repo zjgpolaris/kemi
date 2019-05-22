@@ -2,7 +2,7 @@
     <div id="accountManager">
         <jg-table width="60%" title="用户管理">
             <template slot="jgTable-head">
-                <el-button type="primary" size="mini" @click="dialogVisible=true">新增账号</el-button>
+                <el-button type="primary" size="mini" @click="addNewUser">新增账号</el-button>
             </template>
             <template slot="jgTable-content">
                 <el-table
@@ -37,7 +37,7 @@
             </template>
         </jg-table>
         <el-dialog
-        title="新增账号"
+        :title="isUpdataUser?'更新账号':'新增账号'"
         :visible.sync="dialogVisible"
         width="30%"
         :before-close="handleClose">
@@ -49,14 +49,14 @@
                 <el-input type="password" v-model="ruleForm.password"></el-input>
             </el-form-item>
             <el-form-item label="角色">
-                <el-radio-group v-model="ruleForm.type">
-                        <el-radio v-for="(item,index) in allRoles" :key="index" :label="item.roleName"></el-radio>
-                </el-radio-group>
+                <el-checkbox-group v-model="ruleForm.roles">
+                        <el-checkbox v-for="(item,index) in allRoles" :key="index" :label="item._id"></el-checkbox>
+                </el-checkbox-group>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
             <el-button @click="cancel">取 消</el-button>
-            <el-button type="primary" @click="addNewUser">确 定</el-button>
+            <el-button type="primary" @click="addNew">{{isUpdataUser?'更 新':'新 增'}}</el-button>
         </span>
         </el-dialog>
     </div>
@@ -68,11 +68,12 @@ export default {
     data(){
         return{
             allUsers : [],
+            isUpdataUser : false,
             dialogVisible : false,
             ruleForm : {
                 username : '',
                 password : '',
-                type : []
+                roles : []
             },
             rules : {
                 username :[
@@ -85,39 +86,65 @@ export default {
         }
     },
     methods:{
-        handleEdit(index, row) {
+        handleEdit(index, row) { //编辑
             console.log(index, row);
-            this.ruleForm = row;
+            this.isUpdataUser = true
+            this.ruleForm.username = row.username;
+            this.ruleForm.password = row.password;
+            this.ruleForm.roles = row.roles;
+            this.ruleForm._id = row._id;
             this.dialogVisible = true
 
         },
-        handleDelete(index, row) {
+        handleDelete(index, row) {  //删除
             console.log(index, row);
-            this.$http.post(this.$apis.deleteUser,row).then(()=>{
-                console.log('删除了')
-                this.Refresh()
-            })
+            var action = ()=>{
+                this.post(this.$apis.deleteUser,row).then(()=>{
+                    this.Refresh()
+                })
+            }
+            this.operatorConfirm('删除',action)
         },
-        handleClose(done) {
+        handleClose(done) {   //关闭
         this.$confirm('确认关闭？')
-          .then(_ => {
-            done();
-          })
-          .catch(_ => {});
-      },
-      cancel(){
-          this.ruleForm ={};
-          this.ruleForm.type = [];
-          this.dialogVisible=false
-      },
-      addNewUser(){
-          console.log(this.$refs);
-          this.$refs.ruleForm.validate((valid)=>{
-              if(valid){
-                this.dialogVisible = false
-              }
-          })
-      }
+            .then(_ => {
+                this.ruleForm = {};
+                this.ruleForm.roles = []
+                done();
+            })
+            .catch(_ => {});
+        },
+        cancel(){   //取消
+            this.ruleForm ={};
+            this.ruleForm.roles = []
+            this.dialogVisible=false
+        },
+        addNewUser(){  //新增用户
+            this.dialogVisible = true;
+            this.isUpdataUser = false
+        },
+        addNew(){          //确定按钮
+            console.log(this.$refs);
+            this.$refs.ruleForm.validate((valid)=>{
+                if(valid){
+                    if(!this.isUpdataUser){
+                        this.post(this.$apis.addNewUser,this.ruleForm).then((resp)=>{
+                            console.log(resp)
+                            this.dialogVisible = false;
+                            this.Refresh()
+                        })
+                    }else{
+                        this.post(this.$apis.updateUserInfo,this.ruleForm).then((resp)=>{
+                            console.log(this.ruleForm)
+                            console.log(resp)
+                            this.dialogVisible = false;
+                            this.Refresh()
+                        })
+                    }
+                   
+                }
+            })
+        }
     },
     computed:{
         ...mapGetters(['allRoles'])

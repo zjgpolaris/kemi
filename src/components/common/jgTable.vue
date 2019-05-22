@@ -37,6 +37,7 @@ export default {
     .jgTable-head{
         width: 100%;
         height: 40px;
+        line-height: 40px;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -49,6 +50,8 @@ export default {
         bottom: 0;
         width: 100%;
         height:50px;
+        line-height: 50px;
+        text-align: center
     }
     table {
         width: 100%;

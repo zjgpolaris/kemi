@@ -2,7 +2,7 @@
     <div id="RoleManage">
         <jg-table width="60%" title="角色管理">
             <template slot="jgTable-head">
-                <el-button type="primary" size="mini" @click="dialogVisible=true">新增角色</el-button>
+                <el-button type="primary" size="mini" @click="addnew">新增角色</el-button>
             </template>
             <template slot="jgTable-content">
                 <el-table
@@ -32,7 +32,7 @@
             </template>
         </jg-table>
         <el-dialog
-        title="新增角色"
+        :title="isUpdataRole?'更新角色':'新增角色'"
         :visible.sync="dialogVisible"
         width="30%"
         :before-close="handleClose">
@@ -54,19 +54,8 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="addNewRole">确 定</el-button>
-            </span>
-        </el-dialog>
-        <el-dialog
-        title="提示"
-        :visible.sync="dialogVisible2"
-        width="30%"
-        :before-close="handleClose2">
-            <span>这是一段信息</span>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible2 = false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible2 = false">确 定</el-button>
+                <el-button @click="cancel">取 消</el-button>
+                <el-button type="primary" @click="addNewRole">{{isUpdataRole?'更 新':'新 增'}}</el-button>
             </span>
         </el-dialog>
     </div>
@@ -77,7 +66,7 @@ export default {
     data(){
         return {
             dialogVisible: false,
-            dialogVisible2: false,
+            isUpdataRole: false,
             addNewRoleInfo : {
                 roleName : '',
                 roleDesc : '',
@@ -104,18 +93,21 @@ export default {
         handleClose(done) {
             this.$confirm('确认关闭？')
             .then(_ => {
+                this.addNewRoleInfo = {};
+                this.addNewRoleInfo.permissions = [];
                 done();
             })
             .catch(_ => {});
         },
-        handleClose2(done) {
-            this.$confirm('确认关闭？')
-            .then(_ => {
-                done();
-            })
-            .catch(_ => {});
+        cancel(){
+            this.addNewRoleInfo ={};
+            this.addNewRoleInfo.permissions = []
+            this.dialogVisible=false
         },
-
+        addnew(){
+            this.dialogVisible =true;
+            this.isUpdataRole = false
+        },
         addNewRole(){
             this.$refs.addNewRoleInfo.validate((valid)=>{
                 if(valid){
@@ -125,25 +117,37 @@ export default {
                         this.addNewRoleInfo.permissions.push(permisssions[i]._id)
                     }
                     console.log(this.addNewRoleInfo.permissions);
-                    this.$http.post(this.$apis.addNewRole,this.addNewRoleInfo)
+                    this.post(this.$apis.addNewRole,this.addNewRoleInfo)
                     .then((resp)=>{
                         console.log(resp)
+                        this.Refresh()
                     });
-                    this.Refresh()
                 }
             })
         },
-        handleDelete(row){
+        handleDelete(row){   //删除
             var action = ()=>{
-                this.$http.post(this.$apis.deleteRole,{_id:row._id})
+                this.post(this.$apis.deleteRole,{_id:row._id})
             }
             this.operatorConfirm('删除',action).then(()=>{
                 this.Refresh()
             })
         },
-        handleEdit(row){
-            this.dialogVisible2 = true
-            console.log(row)
+        handleEdit(row){    //编辑
+            this.dialogVisible = true;
+            this.isUpdataRole = true;
+            this.addNewRoleInfo.roleName = row.roleName;
+            this.addNewRoleInfo.roleDesc = row.roleDesc;
+            this.addNewRoleInfo.permissions = row.permissions;
+            this.addNewRoleInfo._id = row._id;
+            console.log(this.addNewRoleInfo.permissions);
+            console.log(this.$refs.permissions);
+            var permissions = this.addNewRoleInfo.permissions;
+            for(var i=0;i<permissions.length;i++){
+                this.$http.get(this.$apis.findPermissionById,{id:permissions[i]}).then((resp)=>{
+                    console.log(resp)
+                })
+            }
         }
     },
 }
