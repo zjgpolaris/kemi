@@ -14,6 +14,7 @@ export default new Router({
         {path:'accountManager',name:'accountManager',component:()=>import(/*webpackChunkName:'accountManager' */ '@/components/System/accountManager/accountManager')},
         {path:'PermissionManage',name:'PermissionManage',component:()=>import(/*webpackChunkName:'PermissionManage' */ '@/components/System/PermissionManage/PermissionManage')},
         {path:'LotteryList',name:'LotteryList',component:()=>import(/*webpackChunkName:'LotteryList' */ '@/components/Lottery/LotteryList/LotteryList')},
+        {path:'LotteryNews',name:'LotteryNews',component:()=>import(/*webpackChunkName:'LotteryNews' */ '@/components/Lottery/LotteryNews/LotteryNews')},
       ] 
     }
   ]

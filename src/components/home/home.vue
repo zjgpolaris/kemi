@@ -11,14 +11,14 @@
                 background-color="#545c64"
                 text-color="#fff"
                 active-text-color="#ffd04b">
-                    <template v-for="(item,index) in arr">
-                        <el-submenu :index="index+''">
+                    <template v-for="(item,index) in arr" >
+                        <el-submenu :index="index+''" :key="index">
                             <template slot="title">
                             <i class="el-icon-location"></i>
                             <span>{{item.permissionDesc}}</span>
                             </template>
                             <template v-for="(value,key) in item.children">
-                                <el-menu-item :index="index+'-'+key" @click="pushView({name:value.permissionName})">{{value.permissionDesc}}</el-menu-item>
+                                <el-menu-item :index="index+'-'+key" :key="index+value.permissionName" @click="pushView({name:value.permissionName})">{{value.permissionDesc}}</el-menu-item>
                             </template>
                         </el-submenu>
                     </template>
@@ -47,6 +47,9 @@ export default {
           }
           this.operatorConfirm('退出',action)
       }
+    },
+    created(){
+        this.$store.dispatch('loadAllPermission')
     },
     mounted(){
         var response = JSON.parse(localStorage.response);

@@ -1,6 +1,6 @@
 <template>
-    <div id="LotteryNews">
-        LotteryNews
+    <div id="LotteryList">
+        LotteryList
     </div>
 </template>
 
