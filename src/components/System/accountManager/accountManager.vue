@@ -50,7 +50,7 @@
             </el-form-item>
             <el-form-item label="角色">
                 <el-checkbox-group v-model="ruleForm.roles">
-                        <el-checkbox v-for="(item,index) in allRoles" :key="index" :label="item._id"></el-checkbox>
+                        <el-checkbox v-for="(item,index) in allRoles" :key="index" :label="item._id">{{item.roleName}}</el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
         </el-form>

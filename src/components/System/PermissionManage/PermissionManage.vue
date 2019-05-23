@@ -8,6 +8,7 @@
                 <el-tree
                 :data="allPermission"
                 :props="defaultProps"
+                :render-content="renderContent"
                 accordion>
                 </el-tree>
             </template>
@@ -80,8 +81,6 @@ export default {
             this.newPermission = {};
         },
         addPermission(){
-            console.log(this.newPermission);
-            console.log(this.$refs.newPermission)
             this.$refs.newPermission.validate((valid)=>{
                 if(valid){
                     this.post(this.$apis.addNewPersmission,this.newPermission).then((resp)=>{
@@ -90,6 +89,33 @@ export default {
                     })
                 }
             })
+        },
+        remove(node, data) {
+            console.log(data)
+            var action = ()=>{
+                if(data.children){
+                    for(let i =0;i<data.children.length;i++){
+                        this.post(this.$apis.deletePermission,{_id:data.children[i]._id})
+                    }
+                }
+    
+                this.post(this.$apis.deletePermission,data).then((resp)=>{
+                    console.log(resp)
+                })
+            }
+            this.operatorConfirm('删除'+data.permissionDesc,action)
+        },
+
+        renderContent(h, { node, data, store }) {
+            return (
+            <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 14px; padding-right: 8px;">
+                <span>
+                <span>{node.label}</span>
+                </span>
+                <span>
+                <el-button style="font-size: 12px;" type="text" on-click={ () => this.remove(node, data) }>Delete</el-button>
+                </span>
+            </span>);
         }
     },
     computed: {

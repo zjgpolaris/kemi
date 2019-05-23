@@ -19,7 +19,7 @@
                 <el-form-item label="small-icons">
                     <el-upload
                     class="avatar-uploader"
-                    action="http://localhost:8080/home/LotteryList"
+                    action="http://localhost:3000/public/images/"
                     :show-file-list="false"
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload">
@@ -30,7 +30,7 @@
                 <el-form-item label="big-icons">
                     <el-upload
                     class="avatar-uploader2"
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    action="http://localhost:3000/public/images/"
                     :show-file-list="false"
                     :on-success="handleAvatarSuccess2"
                     :before-upload="beforeAvatarUpload2">
@@ -61,10 +61,7 @@ export default {
     methods: {
         goToLottery(item){
             console.log(item)
-            //   this.pushView({name:'lotterygame',})
-            this.$http.get(this.$apis.findByGameName,{gameName:item.en,pageNo:1,pageSize:10}).then((resp)=>{
-                console.log(resp)
-            });
+            this.pushView({name:'LotteryGame',query:item.en})
         },
         handleClose(done) {
             this.$confirm('确认关闭？')
@@ -107,7 +104,12 @@ export default {
     mounted () {
         this.$http.get(this.$apis.findAllGames).then((resp)=>{
             this.list = resp.data.data;
-            this.games = this.list[0].games
+            var baseUrl = process.env.VUE_APP_BaseURL.slice(0,-1)
+            this.games = this.list[0].games;
+            for(var i=0;i<this.games.length;i++){
+                this.games[i].icon = baseUrl + this.games[i].icon;
+                this.games[i].icon2 = baseUrl + this.games[i].icon2;
+            }
         })
     }
 }
@@ -120,6 +122,7 @@ export default {
         padding: 20px;
         box-sizing: border-box;
         display: flex;
+        position: relative;
         .icon{
             width: 80px;
             height: 80px;

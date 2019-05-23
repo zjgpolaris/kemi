@@ -47,7 +47,7 @@
                     <el-tree
                         :data="allPermission"
                         show-checkbox
-                        node-key="permissionDesc"
+                        node-key="_id"
                         ref="permissions"
                         :props="defaultProps">
                         </el-tree>
@@ -101,7 +101,8 @@ export default {
         },
         cancel(){
             this.addNewRoleInfo ={};
-            this.addNewRoleInfo.permissions = []
+            this.addNewRoleInfo.permissions = [];
+            this.$refs.permissions.setCheckedKeys([]);
             this.dialogVisible=false
         },
         addnew(){
@@ -111,17 +112,21 @@ export default {
         addNewRole(){
             this.$refs.addNewRoleInfo.validate((valid)=>{
                 if(valid){
-                    this.dialogVisible=false;
-                    var permisssions = this.$refs.permissions.getCheckedNodes();
-                    for(var i=0;i<permisssions.length;i++){
-                        this.addNewRoleInfo.permissions.push(permisssions[i]._id)
+                    if(!this.isUpdataRole){
+                        this.dialogVisible=false;
+                        var permisssions = this.$refs.permissions.getCheckedNodes();
+                        for(var i=0;i<permisssions.length;i++){
+                            this.addNewRoleInfo.permissions.push(permisssions[i]._id)
+                        }
+                        console.log(this.addNewRoleInfo.permissions);
+                        this.post(this.$apis.addNewRole,this.addNewRoleInfo)
+                        .then((resp)=>{
+                            console.log(resp)
+                            this.Refresh()
+                        });
+                    }else{
+                        console.log('更新')
                     }
-                    console.log(this.addNewRoleInfo.permissions);
-                    this.post(this.$apis.addNewRole,this.addNewRoleInfo)
-                    .then((resp)=>{
-                        console.log(resp)
-                        this.Refresh()
-                    });
                 }
             })
         },
@@ -140,14 +145,13 @@ export default {
             this.addNewRoleInfo.roleDesc = row.roleDesc;
             this.addNewRoleInfo.permissions = row.permissions;
             this.addNewRoleInfo._id = row._id;
-            console.log(this.addNewRoleInfo.permissions);
-            console.log(this.$refs.permissions);
-            var permissions = this.addNewRoleInfo.permissions;
-            for(var i=0;i<permissions.length;i++){
-                this.$http.get(this.$apis.findPermissionById,{id:permissions[i]}).then((resp)=>{
-                    console.log(resp)
-                })
+            var permissions = []
+            for(var i=0;i<this.addNewRoleInfo.permissions.length;i++){
+                permissions.push({_id:this.addNewRoleInfo.permissions[i]})
             }
+            setTimeout(()=>{
+                this.$refs.permissions.setCheckedNodes(permissions)
+            },0)
         }
     },
 }

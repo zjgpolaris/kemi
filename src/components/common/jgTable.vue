@@ -28,6 +28,7 @@ export default {
 <style lang="scss" scoped>
     #jgTable{
         position: relative;
+        min-width: 500px;
         min-height: 200px;
         box-shadow: 0 0 5px 5px rgba(204, 200, 200, 0.616);
         border-radius: 2px;
