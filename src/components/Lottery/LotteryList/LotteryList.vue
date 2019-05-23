@@ -1,7 +1,7 @@
 <template>
     <div id="LotteryNews">
         <div class="icon" v-for="(item,index) in games" :key="index" @click="goToLottery(item)">
-            <img :src="item.icon" alt="">
+            <img :src="item.icon2" alt="">
         </div>
         <div class="addgame el-icon-plus" @click="dialogVisible=true"></div>
         <el-dialog
@@ -9,39 +9,23 @@
         :visible.sync="dialogVisible"
         width="30%"
         :before-close="handleClose">
-            <el-form ref="addNewGame" :model="addNewGame" label-width="100px">
-                <el-form-item label="彩票英文名">
+            <el-form ref="addNewGame" status-icon :rules="rules" :model="addNewGame" label-width="100px">
+                <el-form-item label="彩票英文名" prop="en">
                     <el-input v-model="addNewGame.en"></el-input>
                 </el-form-item>
-                <el-form-item label="彩票中文名">
+                <el-form-item label="彩票中文名" prop="cn">
                     <el-input v-model="addNewGame.cn"></el-input>
                 </el-form-item>
                 <el-form-item label="small-icons">
-                    <el-upload
-                    class="avatar-uploader"
-                    action="http://localhost:3000/public/images/"
-                    :show-file-list="false"
-                    :on-success="handleAvatarSuccess"
-                    :before-upload="beforeAvatarUpload">
-                    <img v-if="addNewGame.icon" :src="addNewGame.icon" class="avatar">
-                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
+                    <input type="file" @change="getFile($event,1)">
                 </el-form-item>
                 <el-form-item label="big-icons">
-                    <el-upload
-                    class="avatar-uploader2"
-                    action="http://localhost:3000/public/images/"
-                    :show-file-list="false"
-                    :on-success="handleAvatarSuccess2"
-                    :before-upload="beforeAvatarUpload2">
-                    <img v-if="addNewGame.icon2" :src="addNewGame.icon2" class="avatar2">
-                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
+                    <input type="file" @change="getFile($event,2)">
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+                <el-button type="primary" @click="submitForm($event)">确 定</el-button>
             </span>
         </el-dialog>
         <router-view></router-view>
@@ -49,13 +33,26 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
     data () {
         return {
             list : [],
             games : [],
             dialogVisible : false,
-            addNewGame : {}, 
+            addNewGame : {
+                en : '',
+                cn : '',
+                file : []
+            },
+            rules : {
+                en : [
+                    {required:true,message:'英文名不能为空',trigger:'blur'}
+                ],
+                cn : [
+                    {required:true,message:'中文名不能为空',trigger:'blur'}
+                ]
+            } 
         }
     },
     methods: {
@@ -70,35 +67,41 @@ export default {
             })
             .catch(_ => {});
         },
-        handleAvatarSuccess(res, file) {
-            this.imageUrl = URL.createObjectURL(file.raw);
+        getFile(event,num) {
+            console.log(event.target.files)
+            if(num==1){
+                this.addNewGame.file[0]=event.target.files[0]
+            }else if(num==2){
+                this.addNewGame.file[1]=event.target.files[0]
+            }
+            console.log(this.addNewGame.file);
         },
-        beforeAvatarUpload(file) {
-            const isJPG = file.type === 'image/jpeg';
-            const isLt2M = file.size / 40 / 40 < 2;
-
-            if (!isJPG) {
-            this.$message.error('上传头像图片只能是 JPG 格式!');
-            }
-            if (!isLt2M) {
-            this.$message.error('上传头像图片大小不能超过 2MB!');
-            }
-            return isJPG && isLt2M;
-        },
-        handleAvatarSuccess2(res, file) {
-            this.imageUrl = URL.createObjectURL(file.raw);
-        },
-        beforeAvatarUpload2(file) {
-            const isJPG = file.type === 'image/jpeg';
-            const isLt2M = file.size / 80 / 80 < 2;
-
-            if (!isJPG) {
-            this.$message.error('上传头像图片只能是 JPG 格式!');
-            }
-            if (!isLt2M) {
-            this.$message.error('上传头像图片大小不能超过 2MB!');
-            }
-            return isJPG && isLt2M;
+        submitForm(event) {
+            event.preventDefault();
+            this.$refs.addNewGame.validate((valid)=>{
+                if(valid){
+                    let formData = new FormData();
+                    formData.append('en', this.addNewGame.en);
+                    formData.append('cn', this.addNewGame.cn);
+                    for(var i=0;i<this.addNewGame.file.length;i++){
+                        formData.append('file', this.addNewGame.file[i]);
+                    }
+        
+                    let config = {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                    }
+                    var url = process.env.VUE_APP_BaseURL.slice(0,-1) + this.$apis.addNewGame
+                    console.log(url);
+                    console.log(axios)
+                    axios.post(url,formData,config).then((resp)=>{
+                        console.log(resp)
+                    })
+                }else{
+                    return false
+                }
+            })
         }
     },
     mounted () {
@@ -129,6 +132,7 @@ export default {
             border-radius: 50%;
             border: 1px solid lightgray;
             margin-right: 20px;
+            overflow: hidden;
             img{
                 width: 100%;
             }
@@ -142,56 +146,5 @@ export default {
             border: 1px dashed #000;
             font-size: 25px
         }
-    }
-    .avatar-uploader  {
-        border: 1px dashed #000;
-        width: 40px;
-        border-radius: 6px;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-    .avatar-uploader .el-upload:hover {
-        border-color: #409EFF;
-    }
-    .avatar-uploader-icon {
-        font-size: 20px;
-        color: #8c939d;
-        width: 40px;
-        height: 40px;
-        line-height: 40px;
-        text-align: center;
-    }
-    .avatar {
-        width: 40px;
-        height: 40px;
-        display: block;
-    }
-    .avatar-uploader2  {
-        border: 1px dashed #000;
-        width: 80px;
-        height: 80px;
-        text-align: center;
-        line-height: 80px;
-        border-radius: 6px;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-    .avatar-uploader2 .el-upload2:hover {
-        border-color: #409EFF;
-    }
-    .avatar-uploader-icon:last-child {
-        font-size: 30px;
-        color: #8c939d;
-        width: 80px;
-        height: 80px;
-        line-height: 80px;
-        text-align: center;
-    }
-    .avatar2 {
-        width: 80px;
-        height: 80px;
-        display: block;
     }
 </style>
