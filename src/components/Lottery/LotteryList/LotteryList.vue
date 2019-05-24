@@ -35,7 +35,7 @@
             </span>
         </el-dialog>
         <transition 
-        enter-active-class="animated tada"
+        enter-active-class="animated rotateInUpLeft"
         leave-active-class="animated bounceOutRight"
         >
             <router-view></router-view>
