@@ -25,7 +25,12 @@
                 </el-menu>
             </div>
             <div id="content">
-                <router-view></router-view>
+                <transition
+                    enter-active-class="animated bounceInRight"
+                    leave-active-class="animated bounceOutRight"
+                >
+                    <router-view></router-view>
+                </transition>
             </div>
         </div>
     </div>

@@ -17,10 +17,16 @@
                     <el-input v-model="addNewGame.cn"></el-input>
                 </el-form-item>
                 <el-form-item label="small-icons">
-                    <input type="file" @change="getFile($event,1)">
+                    <span  class="upload">
+                        <i class="el-icon-plus add"></i>
+                        <input type="file" @change="getFile($event,1)">
+                    </span>
                 </el-form-item>
                 <el-form-item label="big-icons">
-                    <input type="file" @change="getFile($event,2)">
+                    <span  class="upload">
+                        <span class="el-icon-plus add"></span>
+                        <input type="file" @change="getFile($event,2)">
+                    </span>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -28,7 +34,12 @@
                 <el-button type="primary" @click="submitForm($event)">确 定</el-button>
             </span>
         </el-dialog>
-        <router-view></router-view>
+        <transition 
+        enter-active-class="animated tada"
+        leave-active-class="animated bounceOutRight"
+        >
+            <router-view></router-view>
+        </transition>
     </div>
 </template>
 
@@ -146,5 +157,27 @@ export default {
             border: 1px dashed #000;
             font-size: 25px
         }
+        .upload{
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+            border: 1px dashed black;
+            input{
+                position:absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                opacity: 0;
+            }
+        }
+        .add{
+            display: block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center
+        }
+        
     }
 </style>
