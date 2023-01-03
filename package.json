@@ -15,8 +15,8 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.7.0",
-    "@vue/cli-service": "^3.7.0",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "compression-webpack-plugin": "^2.0.0",
     "element-ui": "^2.8.2",
     "node-sass": "^4.9.0",
